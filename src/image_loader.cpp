@@ -111,10 +111,10 @@ loadMapFromFile(nav_msgs::GetMap::Response* resp,
 
       // If negate is true, we consider blacker pixels free, and whiter
       // pixels free.  Otherwise, it's vice versa.
-      if(negate)
-        occ = color_avg;
+      if(!negate)
+        occ = fabs(color_avg -63);
       else
-        occ = 255 - color_avg;
+        occ = 255 -( color_avg-63);
       
       resp->map.data[MAP_IDX(resp->map.info.width,i,resp->map.info.height - j - 1)] = occ;
 
