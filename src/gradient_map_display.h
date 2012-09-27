@@ -51,19 +51,19 @@ class SceneNode;
 class ManualObject;
 }
 
-namespace rviz
+namespace woz_rviz_controls
 {
-
+using namespace rviz;
 /**
  * \class MapDisplay
  * \brief Displays a map along the XZ plane (XY in robot space)
  *
  */
-class MapDisplay : public Display
+class GradientMapDisplay : public Display
 {
 public:
-  MapDisplay();
-  virtual ~MapDisplay();
+  GradientMapDisplay();
+  virtual ~GradientMapDisplay();
 
   void onInitialize();
 
@@ -142,6 +142,6 @@ protected:
   bool hidden_;
 };
 
-} // namespace rviz
+} // namespace woz_rviz_controls
 
  #endif

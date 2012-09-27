@@ -48,10 +48,10 @@
 #include <OGRE/OgreMaterialManager.h>
 #include <OGRE/OgreTextureManager.h>
 
-namespace rviz
+namespace woz_rviz_controls
 {
 
-MapDisplay::MapDisplay()
+GradientMapDisplay::GradientMapDisplay()
   : Display()
   , scene_node_( 0 )
   , manual_object_( NULL )
@@ -67,20 +67,20 @@ MapDisplay::MapDisplay()
 {
 }
 
-MapDisplay::~MapDisplay()
+GradientMapDisplay::~GradientMapDisplay()
 {
   unsubscribe();
 
   clear();
 }
 
-void MapDisplay::onInitialize()
+void GradientMapDisplay::onInitialize()
 {
   scene_node_ = scene_manager_->getRootSceneNode()->createChildSceneNode();
 
   static int count = 0;
   std::stringstream ss;
-  ss << "MapObjectMaterial" << count++;
+  ss << "GradientMapObjectMaterial" << count++;
   material_ = Ogre::MaterialManager::getSingleton().create( ss.str(), Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
   material_->setReceiveShadows(false);
   material_->getTechnique(0)->setLightingEnabled(false);
@@ -91,32 +91,32 @@ void MapDisplay::onInitialize()
   setAlpha( 0.7f );
 }
 
-void MapDisplay::onEnable()
+void GradientMapDisplay::onEnable()
 {
   subscribe();
   scene_node_->setVisible( enabled_ && !hidden_ );
 }
 
-void MapDisplay::onDisable()
+void GradientMapDisplay::onDisable()
 {
   unsubscribe();
   scene_node_->setVisible( enabled_ && !hidden_ );
   clear();
 }
 
-void MapDisplay::hideVisible()
+void GradientMapDisplay::hideVisible()
 {
   hidden_ = true;
   scene_node_->setVisible( enabled_ && !hidden_ );
 }
 
-void MapDisplay::restoreVisible()
+void GradientMapDisplay::restoreVisible()
 {
   hidden_ = false;
   scene_node_->setVisible( enabled_ && !hidden_ );
 }
 
-void MapDisplay::subscribe()
+void GradientMapDisplay::subscribe()
 {
   if ( !isEnabled() )
   {
@@ -127,7 +127,7 @@ void MapDisplay::subscribe()
   {
     try
     {
-      map_sub_ = update_nh_.subscribe(topic_, 1, &MapDisplay::incomingMap, this);
+      map_sub_ = update_nh_.subscribe(topic_, 1, &GradientMapDisplay::incomingMap, this);
       setStatus(status_levels::Ok, "Topic", "OK");
     }
     catch (ros::Exception& e)
@@ -137,12 +137,12 @@ void MapDisplay::subscribe()
   }
 }
 
-void MapDisplay::unsubscribe()
+void GradientMapDisplay::unsubscribe()
 {
   map_sub_.shutdown();
 }
 
-void MapDisplay::setAlpha( float alpha )
+void GradientMapDisplay::setAlpha( float alpha )
 {
   alpha_ = alpha;
 
@@ -173,7 +173,7 @@ void MapDisplay::setAlpha( float alpha )
   propertyChanged(alpha_property_);
 }
 
-void MapDisplay::setDrawUnder(bool under)
+void GradientMapDisplay::setDrawUnder(bool under)
 {
   draw_under_ = under;
   if (alpha_ >= 0.9998)
@@ -196,7 +196,7 @@ void MapDisplay::setDrawUnder(bool under)
   propertyChanged(draw_under_property_);
 }
 
-void MapDisplay::setTopic(const std::string& topic)
+void GradientMapDisplay::setTopic(const std::string& topic)
 {
   unsubscribe();
   // something of a hack.  try to provide backwards compatibility with the service-version
@@ -215,7 +215,7 @@ void MapDisplay::setTopic(const std::string& topic)
   propertyChanged(topic_property_);
 }
 
-void MapDisplay::clear()
+void GradientMapDisplay::clear()
 {
   setStatus(status_levels::Warn, "Message", "No map received");
 
@@ -234,7 +234,7 @@ void MapDisplay::clear()
   loaded_ = false;
 }
 
-bool validateFloats(const nav_msgs::OccupancyGrid& msg)
+bool validateFloats1(const nav_msgs::OccupancyGrid& msg)
 {
   bool valid = true;
   valid = valid && validateFloats(msg.info.resolution);
@@ -242,9 +242,9 @@ bool validateFloats(const nav_msgs::OccupancyGrid& msg)
   return valid;
 }
 
-void MapDisplay::load(const nav_msgs::OccupancyGrid::ConstPtr& msg)
+void GradientMapDisplay::load(const nav_msgs::OccupancyGrid::ConstPtr& msg)
 {
-  if (!validateFloats(*msg))
+  if (!validateFloats1(*msg))
   {
     setStatus(status_levels::Error, "Map", "Message contained invalid floating point values (nans or infs)");
     return;
@@ -331,7 +331,7 @@ void MapDisplay::load(const nav_msgs::OccupancyGrid::ConstPtr& msg)
   pixel_stream.bind(new Ogre::MemoryDataStream( pixels, pixels_size ));
   static int tex_count = 0;
   std::stringstream ss;
-  ss << "MapTexture" << tex_count++;
+  ss << "GradientMapTexture" << tex_count++;
   try
   {
     texture_ = Ogre::TextureManager::getSingleton().loadRawData( ss.str(), Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
@@ -394,7 +394,7 @@ void MapDisplay::load(const nav_msgs::OccupancyGrid::ConstPtr& msg)
 
   static int map_count = 0;
   std::stringstream ss2;
-  ss2 << "MapObject" << map_count++;
+  ss2 << "GradientMapObject" << map_count++;
   manual_object_ = scene_manager_->createManualObject( ss2.str() );
   scene_node_->attachObject( manual_object_ );
 
@@ -440,7 +440,7 @@ void MapDisplay::load(const nav_msgs::OccupancyGrid::ConstPtr& msg)
 
   if (draw_under_)
   {
-    manual_object_->setRenderQueueGroup(Ogre::RENDER_QUEUE_4);
+    manual_object_->setRenderQueueGroup(Ogre::RENDER_QUEUE_6);
   }
 
   propertyChanged(resolution_property_);
@@ -456,7 +456,7 @@ void MapDisplay::load(const nav_msgs::OccupancyGrid::ConstPtr& msg)
   causeRender();
 }
 
-void MapDisplay::transformMap()
+void GradientMapDisplay::transformMap()
 {
   if (!map_)
   {
@@ -482,65 +482,65 @@ void MapDisplay::transformMap()
   scene_node_->setOrientation( orientation );
 }
 
-void MapDisplay::update(float wall_dt, float ros_dt)
+void GradientMapDisplay::update(float wall_dt, float ros_dt)
 {
 }
 
-void MapDisplay::createProperties()
+void GradientMapDisplay::createProperties()
 {
-  topic_property_ = property_manager_->createProperty<ROSTopicStringProperty>( "Topic", property_prefix_, boost::bind( &MapDisplay::getTopic, this ),
-                                                                         boost::bind( &MapDisplay::setTopic, this, _1 ), parent_category_, this );
+  topic_property_ = property_manager_->createProperty<ROSTopicStringProperty>( "Topic", property_prefix_, boost::bind( &GradientMapDisplay::getTopic, this ),
+                                                                         boost::bind( &GradientMapDisplay::setTopic, this, _1 ), parent_category_, this );
   setPropertyHelpText(topic_property_, "nav_msgs::OccupancyGrid topic to subscribe to.");
   ROSTopicStringPropertyPtr topic_prop = topic_property_.lock();
   topic_prop->setMessageType(ros::message_traits::datatype<nav_msgs::OccupancyGrid>());
   topic_prop->addLegacyName("Service"); // something of a hack, but should provide reasonable backwards compatibility
 
-  alpha_property_ = property_manager_->createProperty<FloatProperty>( "Alpha", property_prefix_, boost::bind( &MapDisplay::getAlpha, this ),
-                                                                      boost::bind( &MapDisplay::setAlpha, this, _1 ), parent_category_, this );
+  alpha_property_ = property_manager_->createProperty<FloatProperty>( "Alpha", property_prefix_, boost::bind( &GradientMapDisplay::getAlpha, this ),
+                                                                      boost::bind( &GradientMapDisplay::setAlpha, this, _1 ), parent_category_, this );
   setPropertyHelpText(alpha_property_, "Amount of transparency to apply to the map.");
-  draw_under_property_ = property_manager_->createProperty<BoolProperty>( "Draw Behind", property_prefix_, boost::bind( &MapDisplay::getDrawUnder, this ),
-                                                                        boost::bind( &MapDisplay::setDrawUnder, this, _1 ), parent_category_, this );
+  draw_under_property_ = property_manager_->createProperty<BoolProperty>( "Draw Behind", property_prefix_, boost::bind( &GradientMapDisplay::getDrawUnder, this ),
+                                                                        boost::bind( &GradientMapDisplay::setDrawUnder, this, _1 ), parent_category_, this );
   setPropertyHelpText(draw_under_property_, "Rendering option, controls whether or not the map is always drawn behind everything else.");
 
-  resolution_property_ = property_manager_->createProperty<FloatProperty>( "Resolution", property_prefix_, boost::bind( &MapDisplay::getResolution, this ),
+  resolution_property_ = property_manager_->createProperty<FloatProperty>( "Resolution", property_prefix_, boost::bind( &GradientMapDisplay::getResolution, this ),
                                                                             FloatProperty::Setter(), parent_category_, this );
   setPropertyHelpText(resolution_property_, "Resolution of the map. (not editable)");
-  width_property_ = property_manager_->createProperty<IntProperty>( "Width", property_prefix_, boost::bind( &MapDisplay::getWidth, this ),
+  width_property_ = property_manager_->createProperty<IntProperty>( "Width", property_prefix_, boost::bind( &GradientMapDisplay::getWidth, this ),
                                                                     IntProperty::Setter(), parent_category_, this );
   setPropertyHelpText(width_property_, "Width of the map, in meters. (not editable)");
-  height_property_ = property_manager_->createProperty<IntProperty>( "Height", property_prefix_, boost::bind( &MapDisplay::getHeight, this ),
+  height_property_ = property_manager_->createProperty<IntProperty>( "Height", property_prefix_, boost::bind( &GradientMapDisplay::getHeight, this ),
                                                                      IntProperty::Setter(), parent_category_, this );
   setPropertyHelpText(height_property_, "Height of the map, in meters. (not editable)");
-  position_property_ = property_manager_->createProperty<Vector3Property>( "Position", property_prefix_, boost::bind( &MapDisplay::getPosition, this ),
+  position_property_ = property_manager_->createProperty<Vector3Property>( "Position", property_prefix_, boost::bind( &GradientMapDisplay::getPosition, this ),
                                                                            Vector3Property::Setter(), parent_category_, this );
   setPropertyHelpText(position_property_, "Position of the bottom left corner of the map, in meters. (not editable)");
-  orientation_property_ = property_manager_->createProperty<QuaternionProperty>( "Orientation", property_prefix_, boost::bind( &MapDisplay::getOrientation, this ),
+  orientation_property_ = property_manager_->createProperty<QuaternionProperty>( "Orientation", property_prefix_, boost::bind( &GradientMapDisplay::getOrientation, this ),
                                                                                  QuaternionProperty::Setter(), parent_category_, this );
   setPropertyHelpText(orientation_property_, "Orientation of the map. (not editable)");
 }
 
-void MapDisplay::fixedFrameChanged()
+void GradientMapDisplay::fixedFrameChanged()
 {
   transformMap();
 }
 
-void MapDisplay::reset()
+void GradientMapDisplay::reset()
 {
-  Display::reset();
+//  Display::reset();
 
   clear();
   // Force resubscription so that the map will be re-sent
   setTopic(topic_);
 }
 
-void MapDisplay::incomingMap(const nav_msgs::OccupancyGrid::ConstPtr& msg)
+void GradientMapDisplay::incomingMap(const nav_msgs::OccupancyGrid::ConstPtr& msg)
 {
   load(msg);
 }
 
-} // namespace rviz
+} // namespace woz_rviz_controls
 
 #include <pluginlib/class_list_macros.h>
-PLUGINLIB_DECLARE_CLASS( woz_rviz_controls, GradientMap, rviz::MapDisplay, rviz::Display )
+PLUGINLIB_DECLARE_CLASS( woz_rviz_controls, GradientMap, woz_rviz_controls::GradientMapDisplay, rviz::Display )
 
 
