@@ -112,19 +112,21 @@ loadMapFromFile(nav_msgs::GetMap::Response* resp,
       // If negate is true, we consider blacker pixels free, and whiter
       // pixels free.  Otherwise, it's vice versa.
       if(negate)
-        occ = color_avg / 255.0;
+        occ = color_avg;
       else
-        occ = (255 - color_avg) / 255.0;
+        occ = 255 - color_avg;
       
+      resp->map.data[MAP_IDX(resp->map.info.width,i,resp->map.info.height - j - 1)] = occ;
+
       // Apply thresholds to RGB means to determine occupancy values for
       // map.  Note that we invert the graphics-ordering of the pixels to
       // produce a map with cell (0,0) in the lower-left corner.
-      if(occ > occ_th)
-        resp->map.data[MAP_IDX(resp->map.info.width,i,resp->map.info.height - j - 1)] = +100;
-      else if(occ < free_th)
-        resp->map.data[MAP_IDX(resp->map.info.width,i,resp->map.info.height - j - 1)] = 0;
-      else
-        resp->map.data[MAP_IDX(resp->map.info.width,i,resp->map.info.height - j - 1)] = -1;
+      //if(occ > occ_th)
+        //resp->map.data[MAP_IDX(resp->map.info.width,i,resp->map.info.height - j - 1)] = +100;
+      //else if(occ < free_th)
+        //resp->map.data[MAP_IDX(resp->map.info.width,i,resp->map.info.height - j - 1)] = 0;
+      //else
+        //resp->map.data[MAP_IDX(resp->map.info.width,i,resp->map.info.height - j - 1)] = -1;
     }
   }
 
