@@ -311,18 +311,21 @@ void MapDisplay::load(const nav_msgs::OccupancyGrid::ConstPtr& msg)
     }
   }
 
-  for( unsigned int pixel_index = 0; pixel_index < num_pixels_to_copy; pixel_index++ )
-  {
-    unsigned char val;
-    if(msg->data[ pixel_index ] == 100)
-      val = 0;
-    else if(msg->data[ pixel_index ] == 0)
-      val = 255;
-    else
-      val = 127;
+  // Disable indexing, so we can have grayscale image
+//  for( unsigned int pixel_index = 0; pixel_index < num_pixels_to_copy; pixel_index++ )
+//  {
+//    unsigned char val;
+//    if(msg->data[ pixel_index ] == 100)
+//      val = 0;
+//    else if(msg->data[ pixel_index ] == 0)
+//      val = 255;
+//    else
+//      val = 127;
+//
+//    pixels[pixel_index] = msg->data[pixel_index];
+//  }
 
-    pixels[ pixel_index ] = val;
-  }
+  copy (msg->data.begin(), msg->data.begin()+num_pixels_to_copy, pixels);
 
   Ogre::DataStreamPtr pixel_stream;
   pixel_stream.bind(new Ogre::MemoryDataStream( pixels, pixels_size ));
