@@ -105,16 +105,18 @@ loadMapFromFile(nav_msgs::GetMap::Response* resp,
       // Compute mean of RGB for this pixel
       p = pixels + j*rowstride + i*n_channels;
       color_sum = 0;
-      for(k=0;k<n_channels;k++)
+      // Use only last channel (alpha in PNG)
+      for(k=n_channels-1;k<n_channels;k++)
         color_sum += *(p + (k));
-      color_avg = color_sum / (double)n_channels;
+      color_avg = color_sum;// / (double)n_channels;
 
       // If negate is true, we consider blacker pixels free, and whiter
       // pixels free.  Otherwise, it's vice versa.
+
       if(!negate)
-        occ = fabs(color_avg -63);
+        occ = color_avg;
       else
-        occ = 255 -( color_avg-63);
+        occ = 255 - color_avg;
       
       resp->map.data[MAP_IDX(resp->map.info.width,i,resp->map.info.height - j - 1)] = occ;
 
