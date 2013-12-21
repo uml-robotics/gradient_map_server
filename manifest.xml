@@ -22,6 +22,13 @@
      <cpp cflags="-I${prefix}/include `rosboost-cfg --cflags`" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib `rosboost-cfg --lflags thread`"/>
   </export>
 
+  <!--Rviz plugin -->
+  <export>
+     <rviz plugin="${prefix}/plugin_description.xml"/>
+  </export>
+  <depend package="ogre" />
+  <depend package="rviz"/>
+
   <rosdep name="python-imaging"/>
   <rosdep name="python-yaml"/>
   <rosdep name="yaml-cpp" />
