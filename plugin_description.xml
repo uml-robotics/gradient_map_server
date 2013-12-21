@@ -1,0 +1,9 @@
+<library path="lib/libwoz_rviz_controls">
+
+  <class name="woz_rviz_controls/GradientMap" type="woz_rviz_controls::GradientMapDisplay" base_class_type="rviz::Display">
+    <description>
+      Displays a gradient map on the ground plane from a nav_msgs::OccupancyGrid.  &lt;a href="http://www.ros.org/wiki/rviz/DisplayTypes/Map"&gt;More Information&lt;/a&gt;.
+    </description>
+  </class>
+
+</library>
