@@ -27,10 +27,10 @@ set(SOURCE_FILES
 ## Set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
-rosbuild_add_library(${PROJECT_NAME} ${SOURCE_FILES})
-set_target_properties(${PROJECT_NAME} PROPERTIES
+rosbuild_add_library(gradient_map_display ${SOURCE_FILES})
+set_target_properties(gradient_map_display PROPERTIES
   DEFINE_SYMBOL THIS_PACKAGE_NAME="${PROJECT_NAME}")
-target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES} ${OGRE_LIBRARIES})
+target_link_libraries(gradient_map_display ${QT_LIBRARIES} ${OGRE_LIBRARIES})
 
 rosbuild_add_library(image_loader src/image_loader.cpp)
 target_link_libraries(image_loader SDL SDL_image)
